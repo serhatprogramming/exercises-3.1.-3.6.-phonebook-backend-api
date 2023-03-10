@@ -43,16 +43,22 @@ const generateId = () => {
 app.post("/api/persons", (req, res) => {
   let person = req.body;
 
-  if (person.name) {
-    person = {
-      ...person,
-      number: person.number || "111-222-3456",
-      id: generateId(),
-    };
-    persons = persons.concat(person);
-    res.status(200).json(person).end();
+  if (person.name && person.number) {
+    if (persons.find((p) => p.name === person.name)) {
+      res.status(400).json({ error: "no duplicate names" }).end();
+    } else {
+      person = {
+        ...person,
+        id: generateId(),
+      };
+      persons = persons.concat(person);
+      res.status(200).json(person).end();
+    }
   } else {
-    res.status(400).json({ error: "add a name to the contact" }).end();
+    res
+      .status(400)
+      .json({ error: "add a name and a number to the contact" })
+      .end();
   }
 });
 
