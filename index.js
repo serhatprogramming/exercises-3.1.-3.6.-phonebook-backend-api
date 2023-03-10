@@ -1,0 +1,83 @@
+const express = require("express");
+const app = express();
+
+app.use(express.json());
+
+app.get("/api/persons", (req, res) => {
+  res.json(persons);
+});
+
+app.get("/info", (req, res) => {
+  const message = `
+  <p>Phonebook has info for ${persons.length} people</p> 
+  <p>${new Date()}</p>
+  `;
+  res.send(message);
+});
+
+app.get("/api/persons/:id", (req, res) => {
+  const person = persons.find((person) => person.id === Number(req.params.id));
+
+  if (person) {
+    res.json(person).end();
+  } else {
+    res.status(404).end();
+  }
+});
+
+app.delete("/api/persons/:id", (req, res) => {
+  const person = persons.find((person) => person.id === Number(req.params.id));
+
+  if (person) {
+    persons = persons.filter((person) => person.id !== Number(req.params.id));
+    res.status(200).json(person).end();
+  } else {
+    res.status(200).json({ message: "no such person" }).end();
+  }
+});
+
+const generateId = () => {
+  return Math.floor(Math.random() * 100000);
+};
+
+app.post("/api/persons", (req, res) => {
+  let person = req.body;
+
+  if (person.name) {
+    person = {
+      ...person,
+      number: person.number || "111-222-3456",
+      id: generateId(),
+    };
+    persons = persons.concat(person);
+    res.status(200).json(person).end();
+  } else {
+    res.status(400).json({ error: "add a name to the contact" }).end();
+  }
+});
+
+let persons = [
+  {
+    id: 1,
+    name: "Arto Hellas",
+    number: "040-123456",
+  },
+  {
+    id: 2,
+    name: "Ada Lovelace",
+    number: "39-44-5323523",
+  },
+  {
+    id: 3,
+    name: "Dan Abramov",
+    number: "12-43-234345",
+  },
+  {
+    id: 4,
+    name: "Mary Poppendieck",
+    number: "39-23-6423122",
+  },
+];
+
+const PORT = 3001;
+app.listen(PORT, console.log(`The server is listening on PORT ${PORT}`));
