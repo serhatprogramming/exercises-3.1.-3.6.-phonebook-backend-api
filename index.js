@@ -1,7 +1,12 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 
 app.use(express.json());
+
+app.use(morgan("tiny"));
+
+morgan.token("body", (req) => JSON.stringify(req.body));
 
 app.get("/api/persons", (req, res) => {
   res.json(persons);
@@ -40,7 +45,7 @@ const generateId = () => {
   return Math.floor(Math.random() * 100000);
 };
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", morgan(" :body"), (req, res) => {
   let person = req.body;
 
   if (person.name && person.number) {
